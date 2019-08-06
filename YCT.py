@@ -9,10 +9,16 @@ loopBrakes    = 0
 #these control the scan loops. Prevents the scans to be too  frequent
 
 subLightPin = 4
+viewLightPin = 17
+
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(subLightPin, GPIO.OUT)
+GPIO.setup(viewLightPin, GPIO.OUT)
+
 subPWM = GPIO.PWM(subLightPin, 100)
+viewPWM = GPIO.PWM(viewLightPin, 100)
 subPWM.start(0)
+viewPWM.start(0)
 
 key = "AIzaSyD9xf4yeziXrBDuNgSimq9XarHmVvmHDgs"
 #got this from google APIs
@@ -94,7 +100,7 @@ def ProcessIncreases(_channel):
             viewsBrightness = (_channel.views.increase/_channel.views.goal) * 100
             print("Views light at " + str(viewsBrightness) + " % brightness" )
             #This determines how bright the light will be
-
+            viewPWM.start(viewsBrightness)
 
 
     
