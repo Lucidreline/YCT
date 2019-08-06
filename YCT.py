@@ -1,10 +1,18 @@
 import urllib.request
 import json
 import time
+import RPi.GPIO as GPIO
+
 
 scanFrequency = 60 #these are in seconds
 loopBrakes    = 0
 #these control the scan loops. Prevents the scans to be too  frequent
+
+subLightPin = 4
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(subLightPin, GPIO.OUT)
+subPWM = GPIO.PWM(subLightPin, 100)
+subPWM.start(0)
 
 key = "AIzaSyD9xf4yeziXrBDuNgSimq9XarHmVvmHDgs"
 #got this from google APIs
@@ -78,6 +86,7 @@ def ProcessIncreases(_channel):
             subsBrightness = (_channel.subs.increase/_channel.subs.goal) * 100
             print("Subs light at " + str(subsBrightness) + " % brightness" )
             #This determines how bright the light will be
+            subPWM.start(subsBrightness)
 
     if(_channel.views.increase > 0):
         print("\nNEW VIEW for " + _channel.name + "\'S CHANNEL!!\n")
@@ -86,9 +95,9 @@ def ProcessIncreases(_channel):
             print("Views light at " + str(viewsBrightness) + " % brightness" )
             #This determines how bright the light will be
 
-def HandleLights(pinNum, brightness):
-    #turns on a certain light with a certain brightness
-    placeholder = pinNum #just a place holder until I hook up the lights
+
+
+    
 
 def AnalyzeChannel(_channel):
 
