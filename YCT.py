@@ -11,12 +11,12 @@ key = "AIzaSyD9xf4yeziXrBDuNgSimq9XarHmVvmHDgs"
 #Hard coded url: https://www.googleapis.com/youtube/v3/channels?part=statistics&id=UCT5_uqXPSVUaL5r2ChcBVeg&key=AIzaSyD9xf4yeziXrBDuNgSimq9XarHmVvmHDgs
 
 class channel:
-    def __init__(self, name, id, videoCount):
+    def __init__(self, name, id, subGoal, viewGoal):
         self.name   = name
         self.id     = id
-        self.videos = videoCount
-        self.subs   = self.subCount(0, 0, 0)
-        self.views  = self.viewCount(0, 0, 0, 0)
+        self.videos = 0
+        self.subs   = self.subCount(0, 0, subGoal)
+        self.views  = self.viewCount(0, 0, 0, viewGoal)
 
     class subCount:
         def __init__(self, current, original, goal):
@@ -34,86 +34,110 @@ class channel:
             self.goal     = goal
 #this is a big object incase I ever want to track multiple channels           
 
-adrianas = channel("Adrianita's channel", "UCT5_uqXPSVUaL5r2ChcBVeg", 1)
-adrianas.subs.goal = 10
-adrianas.views.goal = 50
-    #the goal controls how bright the light will be. If you meet/exceed the goal then the light will be lit at the max
-#this created the channel and initialized a few things
 
-def getThemSubs():
-    data = urllib.request.urlopen("https://www.googleapis.com/youtube/v3/channels?part=statistics&id=" + adrianas.id +"&key=" + key).read()
-    adrianas.subs.current = json.loads(data)["items"][0]["statistics"]["subscriberCount"]
+def getThemSubs(_channel):
+    data = urllib.request.urlopen("https://www.googleapis.com/youtube/v3/channels?part=statistics&id=" + _channel.id +"&key=" + key).read()
+    _channel.subs.current = json.loads(data)["items"][0]["statistics"]["subscriberCount"]
     #this gets the number of subscribers that the channel has
 
-def getThemViews():
-    data = urllib.request.urlopen("https://www.googleapis.com/youtube/v3/channels?part=statistics&id=" + adrianas.id +"&key=" + key).read()
-    adrianas.views.current = json.loads(data)["items"][0]["statistics"]["viewCount"]
-    adrianas.videos = json.loads(data)["items"][0]["statistics"]["videoCount"]
+
+def getThemViews(_channel):
+    data = urllib.request.urlopen("https://www.googleapis.com/youtube/v3/channels?part=statistics&id=" + _channel.id +"&key=" + key).read()
+    _channel.views.current = json.loads(data)["items"][0]["statistics"]["viewCount"]
+    _channel.videos = json.loads(data)["items"][0]["statistics"]["videoCount"]
     #this gets the number of total views and videos
 
-    adrianas.views.current = int(adrianas.views.current)
-    adrianas.videos = int(adrianas.videos)
-    adrianas.views.average = adrianas.views.current/adrianas.videos * 1.0 
+    _channel.views.current = int(_channel.views.current)
+    _channel.videos = int(_channel.videos)
+    _channel.views.average = _channel.views.current/_channel.videos * 1.0 
     #uses the previous information to find the average ammount of views per video
 
-def Scan():
-    getThemSubs()
-    getThemViews()
+
+def Scan(_channel):
+    getThemSubs(_channel)
+    getThemViews(_channel)
     #this just calls the 2 methods
 
-def DebugPrints():
-    print("current subs: "      + str(adrianas.subs.current))
-    print("original subs: "     + str(adrianas.subs.original))
-    print("increase in subs: "  + str(adrianas.subs.increase))
 
-    print("current views: "     + str(adrianas.views.current))
-    print("original views: "    + str(adrianas.views.original))
-    print("increase in views: " + str(adrianas.views.increase))
+def DebugPrints(_channel):
+    print(_channel.name + "\'s current subs: "      + str(_channel.subs.current))
+    print(_channel.name + "\'s original subs: "     + str(_channel.subs.original))
+    print(_channel.name + "\'s increase in subs: "  + str(_channel.subs.increase))
+
+    print("  ")
+
+    print(_channel.name + "\'s current views: "     + str(_channel.views.current))
+    print(_channel.name + "\'s original views: "    + str(_channel.views.original))
+    print(_channel.name + "\'s increase in views: " + str(_channel.views.increase))
     #prints information to help me debug in the future
 
-Scan()
-#gets the number of subscribers & views
+def ProcessIncreases(_channel):
+    if(_channel.subs.increase > 0):
+        print("\nNEW SUBSCRIBER for " + _channel.name + "\'S CHANNEL!!\n")
+        if(_channel.subs.increase < _channel.subs.goal):
+            subsBrightness = (_channel.subs.increase/_channel.subs.goal) * 100
+            print("Subs light at " + str(subsBrightness) + " % brightness" )
+            #This determines how bright the light will be
+
+    if(_channel.views.increase > 0):
+        print("\nNEW VIEW for " + _channel.name + "\'S CHANNEL!!\n")
+        if(_channel.views.increase < _channel.views.goal):
+            viewsBrightness = (_channel.views.increase/_channel.views.goal) * 100
+            print("Views light at " + str(viewsBrightness) + " % brightness" )
+            #This determines how bright the light will be
+
+def HandleLights(pinNum, brightness):
+    #turns on a certain light with a certain brightness
+    placeholder = pinNum #just a place holder until I hook up the lights
+
+def AnalyzeChannel(_channel):
+
+    #the goal controls how bright the light will be. If you meet/exceed the goal then the light will be lit at the max
+
+    Scan(_channel)
+    #gets the number of subscribers & views
 
 
-#Initial print
-print("Adrianita has " + "{:,d}".format(int(adrianas.subs.current)) + " subscribers!")
-print("Adrianita has " + "{:,d}".format(int(adrianas.views.current)) + " total views!")
-print("Adrianita has an average of " + str(adrianas.views.average) + " views per video")
-#prints what was found in the initial scan
+    #Initial print
+    print(_channel.name + " has " + "{:,d}".format(int(_channel.subs.current)) + " subscribers!")
+    print(_channel.name + " has " + "{:,d}".format(int(_channel.views.current)) + " total views!")
+    print(_channel.name + " has an average of " + str(_channel.views.average) + " views per video")
+    #prints what was found in the initial scan
 
 
-# give the original counts
-adrianas.subs.original  = adrianas.subs.current
-adrianas.views.original = adrianas.views.current
+    # give the original counts
+    _channel.subs.original  = _channel.subs.current
+    _channel.views.original = _channel.views.current
 
 
-while (1==1):
-    if(time.time() > loopBrakes):
-        
-        print("-----")
-        Scan()
+    loopBrakes = 0
+    while (1==1):
 
-        adrianas.subs.increase  = int(adrianas.subs.current)  - int(adrianas.subs.original)
-        adrianas.views.increase = int(adrianas.views.current) - int(adrianas.views.original)
-
-        DebugPrints()
-
-        if(adrianas.subs.increase > 0):
-            print("NEW SUBSCRIBER!")
-            if(adrianas.subs.increase < adrianas.subs.goal):
-                subsBrightness = (adrianas.subs.increase/adrianas.subs.goal) * 100
-                print("Subs light at " + str(subsBrightness) + " % brightness" )
-                #This determines how bright the light will be
-    
-        if(adrianas.views.increase > 0):
-            print("NEW VIEW!")
-            if(adrianas.views.increase < adrianas.views.goal):
-                viewsBrightness = (adrianas.views.increase/adrianas.views.goal) * 100
-                print("Views light at " + str(viewsBrightness) + " % brightness" )
-                #This determines how bright the light will be
-            
         if(1 == 2): #change to if the button is pressed
-            adrianas.subs.original = adrianas.subs.current
-            adrianas.views.original = adrianas.views.current
+                _channel.subs.original = _channel.subs.current 
+                _channel.views.original = _channel.views.current
 
-        loopBrakes = time.time() + scanFrequency #makes the loop happen x seconds later
+        if(time.time() > loopBrakes):
+            print("-----")
+            Scan(_channel)
+
+            _channel.subs.increase  = int(_channel.subs.current)  - int(_channel.subs.original)
+            _channel.views.increase = int(_channel.views.current) - int(_channel.views.original)
+
+            DebugPrints(_channel)
+
+            ProcessIncreases(_channel)
+                
+            #Listens for button input
+            
+
+            loopBrakes = time.time() + scanFrequency #makes the loop happen x seconds later
+
+#-----------------------------------
+#This is where you add your channel, channel ID, aswell as your subscriber and view goals
+
+adrianas = channel("Adrianita", "UCT5_uqXPSVUaL5r2ChcBVeg", 10, 50)
+#this created the channel and initialized a few things
+
+AnalyzeChannel(adrianas)
+            
