@@ -17,8 +17,8 @@ GPIO.setup(viewLightPin, GPIO.OUT)
 
 subPWM = GPIO.PWM(subLightPin, 100)
 viewPWM = GPIO.PWM(viewLightPin, 100)
-subPWM.start(0)
-viewPWM.start(0)
+subPWM.start(50)
+viewPWM.start(100)
 
 key = "AIzaSyD9xf4yeziXrBDuNgSimq9XarHmVvmHDgs"
 #got this from google APIs
