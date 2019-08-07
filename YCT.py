@@ -8,12 +8,16 @@ scanFrequency = 60 #these are in seconds
 loopBrakes    = 0
 #these control the scan loops. Prevents the scans to be too  frequent
 
+
+
 subLightPin = 4
 viewLightPin = 17
+buttonPin = 26
 
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(subLightPin, GPIO.OUT)
 GPIO.setup(viewLightPin, GPIO.OUT)
+GPIO.setup(buttonPin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 subPWM = GPIO.PWM(subLightPin, 100)
 viewPWM = GPIO.PWM(viewLightPin, 100)
@@ -128,9 +132,10 @@ def AnalyzeChannel(_channel):
     loopBrakes = 0
     while (1==1):
 
-        if(1 == 2): #change to if the button is pressed
-                _channel.subs.original = _channel.subs.current 
-                _channel.views.original = _channel.views.current
+        if(GPIO.input(buttonPin)): 
+            print("button pressed!")
+            _channel.subs.original = _channel.subs.current 
+            _channel.views.original = _channel.views.current
 
         if(time.time() > loopBrakes):
             print("-----")
