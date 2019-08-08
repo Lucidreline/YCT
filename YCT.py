@@ -101,7 +101,7 @@ def DebugPrints(_channel):
     print(_channel.name + "\'s increase in views: " + str(_channel.views.increase))
     #prints information to help me debug in the future
    
-    
+#this tells the lights how bright to be as well as reports a new sub/view
 def ProcessIncreases(_channel):
     if(_channel.subs.increase > 0):
         print("\nNEW SUBSCRIBER for " + _channel.name + "\'S CHANNEL!!\n")
@@ -124,9 +124,7 @@ def ProcessIncreases(_channel):
         viewsBrightness = 0
     viewPWM.start(viewsBrightness)
 
-
-    
-
+#This pretty much does everything    
 def AnalyzeChannel(_channel):
 
     #the goal controls how bright the light will be. If you meet/exceed the goal then the light will be lit at the max
@@ -173,8 +171,4 @@ def AnalyzeChannel(_channel):
 
             loopBrakes = time.time() + scanFrequency #makes the loop happen x seconds later
 
-#-----------------------------------
-#This is where you add your channel, channel ID, aswell as your subscriber and view goals
 
-
-            
