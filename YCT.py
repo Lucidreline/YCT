@@ -21,8 +21,8 @@ GPIO.setup(buttonPin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 subPWM = GPIO.PWM(subLightPin, 100)
 viewPWM = GPIO.PWM(viewLightPin, 100)
-subPWM.start(50)
-viewPWM.start(100)
+subPWM.start(0)
+viewPWM.start(0)
 
 key = "AIzaSyD9xf4yeziXrBDuNgSimq9XarHmVvmHDgs"
 #got this from google APIs
@@ -92,19 +92,18 @@ def DebugPrints(_channel):
 def ProcessIncreases(_channel):
     if(_channel.subs.increase > 0):
         print("\nNEW SUBSCRIBER for " + _channel.name + "\'S CHANNEL!!\n")
-        if(_channel.subs.increase < _channel.subs.goal):
-            subsBrightness = (_channel.subs.increase/_channel.subs.goal) * 100
-            print("Subs light at " + str(subsBrightness) + " % brightness" )
-            #This determines how bright the light will be
-            subPWM.start(subsBrightness)
+        
+    subsBrightness = (_channel.subs.increase/_channel.subs.goal) * 100
+    print("Subs light at " + str(subsBrightness) + " % brightness" )
+    #This determines how bright the light will be
+    subPWM.start(subsBrightness)
 
     if(_channel.views.increase > 0):
         print("\nNEW VIEW for " + _channel.name + "\'S CHANNEL!!\n")
-        if(_channel.views.increase < _channel.views.goal):
-            viewsBrightness = (_channel.views.increase/_channel.views.goal) * 100
-            print("Views light at " + str(viewsBrightness) + " % brightness" )
-            #This determines how bright the light will be
-            viewPWM.start(viewsBrightness)
+    viewsBrightness = (_channel.views.increase/_channel.views.goal) * 100
+    print("Views light at " + str(viewsBrightness) + " % brightness" )
+    #This determines how bright the light will be
+    viewPWM.start(viewsBrightness)
 
 
     
@@ -131,11 +130,14 @@ def AnalyzeChannel(_channel):
 
     loopBrakes = 0
     while (1==1):
-
-        if(GPIO.input(buttonPin)): 
+        time.sleep(.1)
+        if(GPIO.input(buttonPin) == False): 
             print("button pressed!")
             _channel.subs.original = _channel.subs.current 
             _channel.views.original = _channel.views.current
+            
+            subPWM.start(0)
+            viewPWM.start(0)
 
         if(time.time() > loopBrakes):
             print("-----")
