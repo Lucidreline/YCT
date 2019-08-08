@@ -1,7 +1,11 @@
 import urllib.request
 import json
 import time
+import datetime
 import RPi.GPIO as GPIO
+
+currentTime = datetime.datetime.now()
+#gets the current time
 
 
 scanFrequency = 60 #these are in seconds
@@ -70,11 +74,16 @@ def getThemViews(_channel):
     _channel.views.average = _channel.views.current/_channel.videos * 1.0 
     #uses the previous information to find the average ammount of views per video
 
+def TimeStamp():
+    print("Date: " + str(currentTime.month) + "/" + str(currentTime.day) + "/" + str(currentTime.year))  
+    print("Time: " + str(currentTime.hour) + ":" + str(currentTime.minute) + ":" + str(currentTime.second) + "\n") 
+     
 
 def Scan(_channel):
+    TimeStamp()
     getThemSubs(_channel)
     getThemViews(_channel)
-    #this just calls the 2 methods
+    #this just calls the methods
 
 
 def DebugPrints(_channel):
@@ -88,7 +97,8 @@ def DebugPrints(_channel):
     print(_channel.name + "\'s original views: "    + str(_channel.views.original))
     print(_channel.name + "\'s increase in views: " + str(_channel.views.increase))
     #prints information to help me debug in the future
-
+   
+    
 def ProcessIncreases(_channel):
     if(_channel.subs.increase > 0):
         print("\nNEW SUBSCRIBER for " + _channel.name + "\'S CHANNEL!!\n")
@@ -99,12 +109,14 @@ def ProcessIncreases(_channel):
     if(subsBrightness < 0):
         subsBrightness = 0
     subPWM.start(subsBrightness)
+    #sets the light brightness
+
 
     if(_channel.views.increase > 0):
         print("\nNEW VIEW for " + _channel.name + "\'S CHANNEL!!\n")
+
     viewsBrightness = (_channel.views.increase/_channel.views.goal) * 100
     print("Views light at " + str(viewsBrightness) + " % brightness" )
-    #This determines how bright the light will be
     if(viewsBrightness < 0):
         viewsBrightness = 0
     viewPWM.start(viewsBrightness)
@@ -135,6 +147,8 @@ def AnalyzeChannel(_channel):
     loopBrakes = 0
     while (1==1):
         time.sleep(.1)
+
+        #Listens for button input
         if(GPIO.input(buttonPin) == False): 
             print("button pressed!")
             _channel.subs.original = _channel.subs.current 
@@ -144,7 +158,7 @@ def AnalyzeChannel(_channel):
             viewPWM.start(0)
 
         if(time.time() > loopBrakes):
-            print("-----")
+            print("- - - - - - - - - - - - - - - - - - - - - - ")
             Scan(_channel)
 
             _channel.subs.increase  = int(_channel.subs.current)  - int(_channel.subs.original)
@@ -154,7 +168,7 @@ def AnalyzeChannel(_channel):
 
             ProcessIncreases(_channel)
                 
-            #Listens for button input
+            
             
 
             loopBrakes = time.time() + scanFrequency #makes the loop happen x seconds later
@@ -162,7 +176,7 @@ def AnalyzeChannel(_channel):
 #-----------------------------------
 #This is where you add your channel, channel ID, aswell as your subscriber and view goals
 
-adrianas = channel("Adrianita", "UCT5_uqXPSVUaL5r2ChcBVeg", 10, 50)
+adrianas = channel("Adrianita", "UCT5_uqXPSVUaL5r2ChcBVeg", 5, 25)
 #this created the channel and initialized a few things
 
 AnalyzeChannel(adrianas)
