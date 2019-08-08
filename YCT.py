@@ -170,17 +170,11 @@ def AnalyzeChannel(_channel):
             DebugPrints(_channel)
 
             ProcessIncreases(_channel)
-                
-            
-            
 
             loopBrakes = time.time() + scanFrequency #makes the loop happen x seconds later
 
 #-----------------------------------
 #This is where you add your channel, channel ID, aswell as your subscriber and view goals
 
-adrianas = channel("Adrianita", "UCT5_uqXPSVUaL5r2ChcBVeg", 5, 25)
-#this created the channel and initialized a few things
 
-AnalyzeChannel(adrianas)
             
