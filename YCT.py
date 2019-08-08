@@ -4,7 +4,7 @@ import time
 import datetime
 import RPi.GPIO as GPIO
 
-currentTime = datetime.datetime.now()
+
 #gets the current time
 
 
@@ -75,6 +75,7 @@ def getThemViews(_channel):
     #uses the previous information to find the average ammount of views per video
 
 def TimeStamp():
+    currentTime = datetime.datetime.now()
     print("Date: " + str(currentTime.month) + "/" + str(currentTime.day) + "/" + str(currentTime.year))  
     print("Time: " + str(currentTime.hour) + ":" + str(currentTime.minute) + ":" + str(currentTime.second) + "\n") 
      
