@@ -107,7 +107,7 @@ def ProcessIncreases(_channel):
         print("\nNEW SUBSCRIBER for " + _channel.name + "\'S CHANNEL!!\n")
         
     subsBrightness = (_channel.subs.increase/_channel.subs.goal) * 100
-    print("\nSubs light :" + str(subsBrightness) + "% brightness" )
+    print("\nSubs light : " + str(subsBrightness) + "% brightness" )
     #This determines how bright the light will be
     if(subsBrightness < 0):
         subsBrightness = 0
