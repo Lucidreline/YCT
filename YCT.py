@@ -96,6 +96,8 @@ def ProcessIncreases(_channel):
     subsBrightness = (_channel.subs.increase/_channel.subs.goal) * 100
     print("Subs light at " + str(subsBrightness) + " % brightness" )
     #This determines how bright the light will be
+    if(subsBrightness < 0):
+        subsBrightness = 0
     subPWM.start(subsBrightness)
 
     if(_channel.views.increase > 0):
@@ -103,6 +105,8 @@ def ProcessIncreases(_channel):
     viewsBrightness = (_channel.views.increase/_channel.views.goal) * 100
     print("Views light at " + str(viewsBrightness) + " % brightness" )
     #This determines how bright the light will be
+    if(viewsBrightness < 0):
+        viewsBrightness = 0
     viewPWM.start(viewsBrightness)
 
 
