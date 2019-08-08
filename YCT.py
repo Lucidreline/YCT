@@ -13,16 +13,18 @@ loopBrakes    = 0
 #these control the scan loops. Prevents the scans to be too  frequent
 
 
-
+#sets the pin numbers from the RPi
 subLightPin = 4
 viewLightPin = 17
 buttonPin = 26
 
+#This sets up the pins on the RPi
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(subLightPin, GPIO.OUT)
 GPIO.setup(viewLightPin, GPIO.OUT)
 GPIO.setup(buttonPin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
+#sets up the brightness functionality and starts the lights off at 0% brightness
 subPWM = GPIO.PWM(subLightPin, 100)
 viewPWM = GPIO.PWM(viewLightPin, 100)
 subPWM.start(0)
@@ -88,14 +90,14 @@ def Scan(_channel):
 
 
 def DebugPrints(_channel):
-    print(_channel.name + "\'s current subs: "      + str(_channel.subs.current))
-    print(_channel.name + "\'s original subs: "     + str(_channel.subs.original))
+    print(_channel.name + "\'s current subs    : "      + str(_channel.subs.current))
+    print(_channel.name + "\'s original subs   : "     + str(_channel.subs.original))
     print(_channel.name + "\'s increase in subs: "  + str(_channel.subs.increase))
 
     print("  ")
 
-    print(_channel.name + "\'s current views: "     + str(_channel.views.current))
-    print(_channel.name + "\'s original views: "    + str(_channel.views.original))
+    print(_channel.name + "\'s current views    : "     + str(_channel.views.current))
+    print(_channel.name + "\'s original views   : "    + str(_channel.views.original))
     print(_channel.name + "\'s increase in views: " + str(_channel.views.increase))
     #prints information to help me debug in the future
    
@@ -105,7 +107,7 @@ def ProcessIncreases(_channel):
         print("\nNEW SUBSCRIBER for " + _channel.name + "\'S CHANNEL!!\n")
         
     subsBrightness = (_channel.subs.increase/_channel.subs.goal) * 100
-    print("Subs light at " + str(subsBrightness) + " % brightness" )
+    print("\nSubs light :" + str(subsBrightness) + "% brightness" )
     #This determines how bright the light will be
     if(subsBrightness < 0):
         subsBrightness = 0
@@ -117,7 +119,7 @@ def ProcessIncreases(_channel):
         print("\nNEW VIEW for " + _channel.name + "\'S CHANNEL!!\n")
 
     viewsBrightness = (_channel.views.increase/_channel.views.goal) * 100
-    print("Views light at " + str(viewsBrightness) + " % brightness" )
+    print("Views light: " + str(viewsBrightness) + "% brightness" )
     if(viewsBrightness < 0):
         viewsBrightness = 0
     viewPWM.start(viewsBrightness)
@@ -159,7 +161,7 @@ def AnalyzeChannel(_channel):
             viewPWM.start(0)
 
         if(time.time() > loopBrakes):
-            print("- - - - - - - - - - - - - - - - - - - - - - ")
+            print("- - - - - - - - - - - - - - - - - - - - - - - - -")
             Scan(_channel)
 
             _channel.subs.increase  = int(_channel.subs.current)  - int(_channel.subs.original)
