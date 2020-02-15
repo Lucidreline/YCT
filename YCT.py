@@ -1,11 +1,9 @@
-import urllib.request
-import json
-import time
+from apiclient.discovery import build
+import secret
 import datetime
-import RPi.GPIO as GPIO
-
-
-#gets the current time
+import time
+#import RPi.GPIO as GPIO
+youtube = build('youtube', 'v3', developerKey=secret.YOUTUBE_API_KEY)
 
 
 scanFrequency = 60 #these are in seconds
@@ -19,16 +17,16 @@ viewLightPin = 17
 buttonPin = 26
 
 #This sets up the pins on the RPi
-GPIO.setmode(GPIO.BCM)
-GPIO.setup(subLightPin, GPIO.OUT)
-GPIO.setup(viewLightPin, GPIO.OUT)
-GPIO.setup(buttonPin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    # GPIO.setmode(GPIO.BCM)
+    # GPIO.setup(subLightPin, GPIO.OUT)
+    # GPIO.setup(viewLightPin, GPIO.OUT)
+    # GPIO.setup(buttonPin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 #sets up the brightness functionality and starts the lights off at 0% brightness
-subPWM = GPIO.PWM(subLightPin, 100)
-viewPWM = GPIO.PWM(viewLightPin, 100)
-subPWM.start(0)
-viewPWM.start(0)
+    # subPWM = GPIO.PWM(subLightPin, 100)
+    # viewPWM = GPIO.PWM(viewLightPin, 100)
+    # subPWM.start(0)
+    # viewPWM.start(0)
 
 key = "AIzaSyD9xf4yeziXrBDuNgSimq9XarHmVvmHDgs"
 #got this from google APIs
@@ -111,7 +109,8 @@ def ProcessIncreases(_channel):
     #This determines how bright the light will be
     if(subsBrightness < 0):
         subsBrightness = 0
-    subPWM.start(subsBrightness)
+    print("sublight: " + str(subsBrightness))
+    #subPWM.start(subsBrightness)
     #sets the light brightness
 
 
@@ -122,7 +121,8 @@ def ProcessIncreases(_channel):
     print("Views light: " + str(viewsBrightness) + "% brightness" )
     if(viewsBrightness < 0):
         viewsBrightness = 0
-    viewPWM.start(viewsBrightness)
+    print("view light: " + str(viewsBrightness))
+    # viewPWM.start(viewsBrightness)
 
 #This pretty much does everything    
 def AnalyzeChannel(_channel):
@@ -150,13 +150,13 @@ def AnalyzeChannel(_channel):
         time.sleep(.1)
 
         #Listens for button input
-        if(GPIO.input(buttonPin) == False): 
-            print("button pressed!")
-            _channel.subs.original = _channel.subs.current 
-            _channel.views.original = _channel.views.current
+        # if(GPIO.input(buttonPin) == False): 
+        #     print("button pressed!")
+        #     _channel.subs.original = _channel.subs.current 
+        #     _channel.views.original = _channel.views.current
             
-            subPWM.start(0)
-            viewPWM.start(0)
+        #     subPWM.start(0)
+        #     viewPWM.start(0)
 
         if(time.time() > loopBrakes):
             print("- - - - - - - - - - - - - - - - - - - - - - - - -")

@@ -1,4 +1,0 @@
-	Print the date and time
-	Add button
-	Make button reset the lights
-	Somehow add both the breadboard and RPi in a box
