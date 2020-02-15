@@ -1,6 +1,7 @@
 from apiclient.discovery import build # used for getting data from youtube through their api
 from datetime import datetime # used for the time stamp on the data reports
 import secret # holds the api key
+import time
 
 youtube = build('youtube', 'v3', developerKey=secret.YOUTUBE_API_KEY) #allows us to use the api using our api key
 
@@ -43,7 +44,8 @@ class Channel:
         self.averageViewsPerVideo = self.ViewCounter.liveCount / self.numOfvideos
 
         ReportData(self, self.SubscriberCounter.liveCount, self.ViewCounter.liveCount, self.numOfvideos, self.averageViewsPerVideo)
-
+        print("Subscriber light should be at " + str(self.SubscriberCounter.GetPercentChange()) + " brightness")
+        print("Views light should be at " + str(self.ViewCounter.GetPercentChange()) + " brightness")
 
     class Counter:
         def __init__(self, _liveCount, _countSinceReset, _goal = 10):
@@ -60,5 +62,54 @@ class Channel:
             self.countSinceReset = self.liveCount
             self.changeInCount = 0
         
-        def GetPercentChangeDecimal(self):
-            self.changeInCount/self._goal
+        def GetPercentChange(self):
+            percentChange = (self.changeInCount/self.goal) * 100
+            if(percentChange < 0.0): # I dont want a negative percent change
+                return 0
+            else:
+                return percentChange
+
+        
+
+subscriberLightPin = 4
+viewLightPin = 17
+resetBtnPin = 26
+
+#This sets up the pins on the RPi
+# GPIO.setmode(GPIO.BCM)
+# GPIO.setup(subscriberLightPin, GPIO.OUT)
+# GPIO.setup(viewLightPin, GPIO.OUT)
+# GPIO.setup(resetBtnPin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+
+#sets up the brightness functionality and starts the lights off at 0% brightness
+# subscriberLight = GPIO.PWM(subscriberLightPin, 100)
+# viewLight = GPIO.PWM(viewLightPin, 100)
+# subscriberLight.start(0)
+# viewLight.start(0)
+
+def RunApp(_channelId):
+    trackingChannel = Channel(_channelId);
+
+
+    loopBrakes = 0
+    scanFrequency = 60 * 1
+
+    while True:
+        time.sleep(.1)
+        
+        #Listens for button input
+        # if(GPIO.input(resetBtnPin) == False): 
+        #     print("Reset Button Activated!")
+
+        #     trackingChannel.SubscriberCounter.ResetCounter()
+        #     trackingChannel.ViewCounter.ResetCounter()
+            
+            # subscriberLight.start(trackingChannel.SubscriberCounter.GetPercentChange())
+            # viewLight.start(trackingChannel.ViewCounter.GetPercentChange())
+
+        if(time.time() > loopBrakes):
+            trackingChannel.UpdateLiveCounts()
+
+            loopBrakes = time.time() + scanFrequency #makes the loop happen x seconds later
+
+RunApp('UCT5_uqXPSVUaL5r2ChcBVeg')
