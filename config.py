@@ -1,0 +1,2 @@
+YOUTUBE_API_KEY='AIzaSyBX_LVCaqI0WgzVoiCyeieDV-_ETGo-C5E'
+ChannelToTrack='UCT5_uqXPSVUaL5r2ChcBVeg'

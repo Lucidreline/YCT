@@ -1,12 +1,23 @@
+# ~ ~ ~ Youtube Channel Tracker ~ ~ ~
+# Prints out basic data from a single channel and notifies you of any channel growth with LED lights
+# Author: Lucidreline
+
+
 from apiclient.discovery import build # used for getting data from youtube through their api
 from datetime import datetime # used for the time stamp on the data reports
-import secret # holds the api key
+#import RPi.GPIO as GPIO # lets us use the led lights and button
+import config # holds the api key, the channel I want to track, etc
+
 import time
 
-youtube = build('youtube', 'v3', developerKey=secret.YOUTUBE_API_KEY) #allows us to use the api using our api key
+try:
+    youtube = build('youtube', 'v3', developerKey=config.YOUTUBE_API_KEY) #allows us to use the api using our api key
+except Exception as e:
+    print(e)
+    exit()
 
-def ReportData(self, _liveSubscribers, _liveViews, _numOfVideos, _averageViewsPerVideo): # prints out the current channel's data
-    results = "\nSubscribers: " + str(_liveSubscribers) + "\nViews: " + str(_liveViews) + "\nVideos: " + str(_numOfVideos) + "\nAverage Views Per Video: " + str(_averageViewsPerVideo)
+def ReportData(_channel): # prints out the current channel's data
+    results = "\nSubscribers: " + str(_channel.SubscriberCounter.liveCount) + "\nViews: " + str(_channel.ViewCounter.liveCount) + "\nVideos: " + str(_channel.numOfvideos) + "\nAverage Views Per Video: " + str(_channel.averageViewsPerVideo)
     currentTime = datetime.now()
 
     print("\n ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ")
@@ -32,8 +43,11 @@ class Channel:
         self.ViewCounter = self.Counter(self.numOfViews, self.numOfViews)
     
     def GetChannelData(self):
-        req = youtube.channels().list(part='snippet,contentDetails,statistics', id=self.channelId).execute()
-        return req['items'][0]['statistics']
+        try:
+            req = youtube.channels().list(part='snippet,contentDetails,statistics', id=self.channelId).execute()
+            return req['items'][0]['statistics']
+        except:
+            print("Failed to get youtube data. Trying again in a bit...")
 
     def UpdateLiveCounts(self):
         channelData = self.GetChannelData()
@@ -43,9 +57,7 @@ class Channel:
         self.numOfvideos = int(channelData['videoCount'])
         self.averageViewsPerVideo = self.ViewCounter.liveCount / self.numOfvideos
 
-        ReportData(self, self.SubscriberCounter.liveCount, self.ViewCounter.liveCount, self.numOfvideos, self.averageViewsPerVideo)
-        print("Subscriber light should be at " + str(self.SubscriberCounter.GetPercentChange()) + " brightness")
-        print("Views light should be at " + str(self.ViewCounter.GetPercentChange()) + " brightness")
+        ReportData(self)
 
     class Counter:
         def __init__(self, _liveCount, _countSinceReset, _goal = 10):
@@ -84,12 +96,30 @@ resetBtnPin = 26
 #sets up the brightness functionality and starts the lights off at 0% brightness
 # subscriberLight = GPIO.PWM(subscriberLightPin, 100)
 # viewLight = GPIO.PWM(viewLightPin, 100)
+# subscriberLight.start(100)
+# viewLight.start(100)
+# time.sleep(3)
 # subscriberLight.start(0)
 # viewLight.start(0)
 
-def RunApp(_channelId):
-    trackingChannel = Channel(_channelId);
 
+banner = """
+  ██▓     █    ██  ▄████▄   ██▓▓█████▄  ██▀███  ▓█████  ██▓     ██▓ ███▄    █ ▓█████ 
+ ▓██▒     ██  ▓██▒▒██▀ ▀█  ▓██▒▒██▀ ██▌▓██ ▒ ██▒▓█   ▀ ▓██▒    ▓██▒ ██ ▀█   █ ▓█   ▀ 
+ ▒██░    ▓██  ▒██░▒▓█    ▄ ▒██▒░██   █▌▓██ ░▄█ ▒▒███   ▒██░    ▒██▒▓██  ▀█ ██▒▒███   
+ ▒██░    ▓▓█  ░██░▒▓▓▄ ▄██▒░██░░▓█▄   ▌▒██▀▀█▄  ▒▓█  ▄ ▒██░    ░██░▓██▒  ▐▌██▒▒▓█  ▄ 
+ ░██████▒▒▒█████▓ ▒ ▓███▀ ░░██░░▒████▓ ░██▓ ▒██▒░▒████▒░██████▒░██░▒██░   ▓██░░▒████▒
+ ░ ▒░▓  ░░▒▓▒ ▒ ▒ ░ ░▒ ▒  ░░▓   ▒▒▓  ▒ ░ ▒▓ ░▒▓░░░ ▒░ ░░ ▒░▓  ░░▓  ░ ▒░   ▒ ▒ ░░ ▒░ ░
+ ░ ░ ▒  ░░░▒░ ░ ░   ░  ▒    ▒ ░ ░ ▒  ▒   ░▒ ░ ▒░ ░ ░  ░░ ░ ▒  ░ ▒ ░░ ░░   ░ ▒░ ░ ░  ░
+   ░ ░    ░░░ ░ ░ ░         ▒ ░ ░ ░  ░   ░░   ░    ░     ░ ░    ▒ ░   ░   ░ ░    ░   
+       ░  ░   ░     ░ ░       ░     ░       ░        ░  ░    ░  ░ ░           ░    ░  ░
+                 ░             ░                                                    
+"""
+
+def RunApp(_channelId):
+
+    print(banner)
+    trackingChannel = Channel(_channelId);
 
     loopBrakes = 0
     scanFrequency = 60 * 1
@@ -109,7 +139,7 @@ def RunApp(_channelId):
 
         if(time.time() > loopBrakes):
             trackingChannel.UpdateLiveCounts()
-
             loopBrakes = time.time() + scanFrequency #makes the loop happen x seconds later
 
-RunApp('UCT5_uqXPSVUaL5r2ChcBVeg')
+
+RunApp(config.ChannelToTrack)
