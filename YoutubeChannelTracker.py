@@ -5,7 +5,7 @@
 
 from apiclient.discovery import build # used for getting data from youtube through their api
 from datetime import datetime # used for the time stamp on the data reports
-#import RPi.GPIO as GPIO # lets us use the led lights and button
+import RPi.GPIO as GPIO # lets us use the led lights and button
 import config # holds the api key, the channel I want to track, etc
 
 import time
@@ -88,19 +88,19 @@ viewLightPin = 17
 resetBtnPin = 26
 
 #This sets up the pins on the RPi
-# GPIO.setmode(GPIO.BCM)
-# GPIO.setup(subscriberLightPin, GPIO.OUT)
-# GPIO.setup(viewLightPin, GPIO.OUT)
-# GPIO.setup(resetBtnPin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(subscriberLightPin, GPIO.OUT)
+GPIO.setup(viewLightPin, GPIO.OUT)
+GPIO.setup(resetBtnPin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 #sets up the brightness functionality and starts the lights off at 0% brightness
-# subscriberLight = GPIO.PWM(subscriberLightPin, 100)
-# viewLight = GPIO.PWM(viewLightPin, 100)
-# subscriberLight.start(100)
-# viewLight.start(100)
-# time.sleep(3)
-# subscriberLight.start(0)
-# viewLight.start(0)
+subscriberLight = GPIO.PWM(subscriberLightPin, 100)
+viewLight = GPIO.PWM(viewLightPin, 100)
+subscriberLight.start(100)
+viewLight.start(100)
+time.sleep(3)
+subscriberLight.start(0)
+viewLight.start(0)
 
 
 banner = """
@@ -128,14 +128,14 @@ def RunApp(_channelId):
         time.sleep(.1)
         
         #Listens for button input
-        # if(GPIO.input(resetBtnPin) == False): 
-        #     print("Reset Button Activated!")
+        if(GPIO.input(resetBtnPin) == False): 
+            print("Reset Button Activated!")
 
-        #     trackingChannel.SubscriberCounter.ResetCounter()
-        #     trackingChannel.ViewCounter.ResetCounter()
+            trackingChannel.SubscriberCounter.ResetCounter()
+            trackingChannel.ViewCounter.ResetCounter()
             
-            # subscriberLight.start(trackingChannel.SubscriberCounter.GetPercentChange())
-            # viewLight.start(trackingChannel.ViewCounter.GetPercentChange())
+            subscriberLight.start(trackingChannel.SubscriberCounter.GetPercentChange())
+            viewLight.start(trackingChannel.ViewCounter.GetPercentChange())
 
         if(time.time() > loopBrakes):
             trackingChannel.UpdateLiveCounts()
